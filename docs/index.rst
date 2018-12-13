@@ -1,5 +1,5 @@
 Welcome to Marvin 2.0 Backend's documentation!
-======================================
+==============================================
 
 .. toctree::
    :maxdepth: 2
