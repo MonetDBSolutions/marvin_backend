@@ -1,4 +1,6 @@
 falcon >= 1.4.1
+gunicorn >= 19.9.0
 mal_analytics >= 0.2.0
+
 
 # ujson >= 1.35
