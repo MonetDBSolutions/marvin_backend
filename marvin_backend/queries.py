@@ -33,3 +33,43 @@ class Queries(object):
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
 
         resp.status = falcon.HTTP_200
+
+
+class SingleQuery(object):
+    def __init__(self, db):
+        self._db = db
+
+    def on_get(self, req, resp, qid):
+        query_q = "SELECT * FROM query WHERE query_id=%(qid)s"
+
+        query = self._db.execute_query(query_q, {'qid': qid})
+        result_t = dict([(k, v.tolist()) for k, v in query.items()])
+        result = utils.DLtoLD(result_t)
+
+
+        if len(result) == 0:
+            result = {}
+        elif len(result) == 1:
+            result = result[0]
+        else:
+            # This cannot happen unless the db constraints in
+            # mal_analytics have somehow failed.
+            msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_q, qid, len(result))
+            LOGGER.error(msg)
+            doc = {
+                'links': {
+                    'url': req.url,
+                },
+                'error': msg
+            }
+            resp.status = falcon.HTTP_500
+
+        doc = {
+            'links': {
+                'url': req.url,
+            },
+            'data': result,
+        }
+
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+        resp.status = falcon.HTTP_200

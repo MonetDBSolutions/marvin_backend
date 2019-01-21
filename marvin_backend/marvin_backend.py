@@ -24,5 +24,7 @@ DB_PATH = CURR_PATH / 'db_path/dev_db'
 api = application = falcon.API()
 db_manager = db_manager.DatabaseManager(str(DB_PATH.resolve()))
 
-queries = queries.Queries(db_manager)
-api.add_route('/queries', queries)
+all_queries = queries.Queries(db_manager)
+api.add_route('/queries', all_queries)
+single_query = queries.SingleQuery(db_manager)
+api.add_route('/queries/{qid}', single_query)
