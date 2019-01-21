@@ -20,6 +20,7 @@ mal-analytics = {editable = true,path = "./../mal_analytics"}
 ipython = "*"
 gunicorn = "*"
 httpie = "*"
+marvin-backend = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
