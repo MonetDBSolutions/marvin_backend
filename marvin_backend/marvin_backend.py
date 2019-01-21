@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 # Copyright MonetDB Solutions B.V. 2018-2019
+import logging
 from pathlib import Path
 
 import falcon
@@ -12,6 +13,8 @@ from mal_analytics import db_manager
 from marvin_backend import queries
 
 """Main module."""
+
+logging.basicConfig(level=logging.DEBUG)
 
 # For development purposes. These need to be set up properly at
 # initialization
