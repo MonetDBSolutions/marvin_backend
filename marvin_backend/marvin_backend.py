@@ -12,7 +12,8 @@ from pathlib import Path
 # import sys
 
 import falcon
-# import gunicorn.app.base
+import gunicorn.app.base
+from gunicorn.six import iteritems
 from mal_analytics import db_manager
 
 from marvin_backend import queries
@@ -36,10 +37,9 @@ def create_app(manager):
     return api
 
 
-def get_app(db_path=None):
+def get_app(database_path=None):
     curr_path = Path().cwd()
-    if db_path is None:
-        db_path = os.environ.get('MARVIN_DB_PATH', './marvin_db')
+    db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
 
     # This works both if db_path is relative, or absolute.
     actual_path = str((curr_path / db_path).resolve())
@@ -49,6 +49,29 @@ def get_app(db_path=None):
 
     return create_app(dbm)
 
-# class Marvin()
+class Marvin(gunicorn.app.base.BaseApplication):
+    def __init__(self, app, options=None):
+        self._options = options or {}
+        self._application = app
+        super(Marvin, self).__init__()
 
-# def main():
+    def load_config(self):
+        config = dict([(key, value) for key, value in iteritems(self._options)
+                       if key in self.cfg.settings and value is not None])
+
+        for key, value in iteritems(config):
+            self.cfg.set(key.lower(), value)
+
+    def load(self):
+        return self._application
+
+def main():
+    options = {
+        'bind': '%s %s' % ('127.0.0.1', '8000'),
+        'workers': 1
+    }
+    Marvin(get_app(), options).run()
+
+
+if __name__ == '__main__':
+    main()
