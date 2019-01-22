@@ -28,10 +28,11 @@ class Queries(object):
                 'url': req.url,
             },
             'data': result,
+            'data_length': len(result),
         }
 
+        # TODO: pagination
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
-
         resp.status = falcon.HTTP_200
 
 
@@ -46,12 +47,7 @@ class SingleQuery(object):
         result_t = dict([(k, v.tolist()) for k, v in query.items()])
         result = utils.DLtoLD(result_t)
 
-
-        if len(result) == 0:
-            result = {}
-        elif len(result) == 1:
-            result = result[0]
-        else:
+        if len(result) != 0 and len(result) != 1:
             # This cannot happen unless the db constraints in
             # mal_analytics have somehow failed.
             msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_q, qid, len(result))
@@ -69,6 +65,7 @@ class SingleQuery(object):
                 'url': req.url,
             },
             'data': result,
+            'data_length': len(result),
         }
 
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
