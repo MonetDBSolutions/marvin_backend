@@ -5,7 +5,7 @@
 #
 # Copyright MonetDB Solutions B.V. 2018-2019
 
-# import argparse
+import argparse
 import logging
 import os
 from pathlib import Path
@@ -66,12 +66,23 @@ class Marvin(gunicorn.app.base.BaseApplication):
     def load(self):
         return self._application
 
+
+def parse_cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dbpath', '-d', help='Path to the database holding the traces')
+    parser.add_argument('--port', '-p', default='8000', help='Port number that the server will listen to')
+    parser.add_argument('--workers', '-w', type=int, default=1, help='Number of workers')
+    return parser.parse_args()
+
+
 def main():
+    arguments = parse_cli()
+    print(arguments)
     options = {
-        'bind': '%s %s' % ('127.0.0.1', '8000'),
-        'workers': 1
+        'bind': '%s:%s' % ('127.0.0.1', arguments.port),
+        'workers': arguments.workers
     }
-    Marvin(get_app(), options).run()
+    Marvin(get_app(arguments.dbpath), options).run()
 
 
 if __name__ == '__main__':
