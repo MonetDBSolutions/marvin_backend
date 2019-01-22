@@ -7,7 +7,7 @@
 import json
 import logging
 
-import falcon 
+import falcon
 
 from marvin_backend import utils
 

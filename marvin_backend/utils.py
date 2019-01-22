@@ -7,15 +7,16 @@
 import json
 import numpy as np
 
+
 def DLtoLD(dl):
     """Turn a dict of lists into a list of dicts
 
 Example:
 ``DLtoLD({'key1':[1, 2], 'key2':['a', 'b']}) = [{'key1':1, 'key2':'a'}, {'key1':2, 'key2':'b'}]``
-    
+
 This essentially transposes the representation of tabular data from
 column based to row based.
-    
+
 :param dl: A dictionary of lists
 :returns: A list of dictionaries
 

@@ -49,6 +49,7 @@ def get_app(database_path=None):
 
     return create_app(dbm)
 
+
 class Marvin(gunicorn.app.base.BaseApplication):
     def __init__(self, app, options=None):
         self._options = options or {}
