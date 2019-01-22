@@ -39,7 +39,9 @@ def create_app(manager):
 
 def get_app(database_path=None):
     curr_path = Path().cwd()
-    db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
+    # db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
+    # For dev purposes
+    db_path = database_path or os.environ.get('MARVIN_DB_PATH', './db_path/dev_db')
 
     # This works both if db_path is relative, or absolute.
     actual_path = str((curr_path / db_path).resolve())
