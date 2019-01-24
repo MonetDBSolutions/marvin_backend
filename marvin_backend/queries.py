@@ -47,7 +47,12 @@ class SingleQuery(object):
         result_t = dict([(k, v.tolist()) for k, v in query.items()])
         result = utils.DLtoLD(result_t)
 
-        if len(result) != 0 and len(result) != 1:
+        if len(result) == 0:
+            # No query with the given qid. This is a 404 error.
+            resp.status = falcon.HTTP_404
+            return
+
+        if len(result) != 1:
             # This cannot happen unless the db constraints in
             # mal_analytics have somehow failed.
             msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_q, qid, len(result))
@@ -59,6 +64,7 @@ class SingleQuery(object):
                 'error': msg
             }
             resp.status = falcon.HTTP_500
+            return
 
         doc = {
             'links': {
