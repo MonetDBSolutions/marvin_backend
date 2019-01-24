@@ -75,3 +75,34 @@ class SingleQuery(object):
 
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
         resp.status = falcon.HTTP_200
+
+
+class QueryExecutions(object):
+    def __init__(self, db):
+        self._db = db
+
+    def on_get(self, req, resp, qid):
+        executions_sql = """
+SELECT sup.worker_id FROM
+                     supervises_executions AS sup JOIN query AS q
+                     ON sup.supervisor_id = q.supervisor_execution_id
+       WHERE q.query_id=%(qid)s
+"""
+
+        executions = self._db.execute_query(executions_sql, {'qid': qid})
+        result = utils.DLtoLD(executions)
+
+        if len(result) == 0:
+            resp.status = falcon.HTTP_404
+            return
+
+        doc = {
+            'links': {
+                'url': req.url,
+            },
+            'data': result,
+            'data_length': len(result),
+        }
+
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+        resp.status = falcon.HTTP_200

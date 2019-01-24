@@ -31,8 +31,12 @@ def create_app(manager):
     # /queries
     all_queries = queries.Queries(manager)
     api.add_route('/queries', all_queries)
+
     single_query = queries.SingleQuery(manager)
     api.add_route('/queries/{qid}', single_query)
+
+    query_executions = queries.QueryExecutions(manager)
+    api.add_route('/queries/{qid}/executions', query_executions)
 
     return api
 
@@ -72,8 +76,10 @@ class Marvin(gunicorn.app.base.BaseApplication):
 def parse_cli():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dbpath', '-d', help='Path to the database holding the traces')
+
     parser.add_argument('--port', '-p', default='8000', help='Port number that the server will listen to')
     parser.add_argument('--workers', '-w', type=int, default=1, help='Number of workers')
+
     return parser.parse_args()
 
 
