@@ -121,17 +121,18 @@ class QueryExecutions(object):
         self._db = db
 
     def on_get(self, req, resp, qid):
+        # The query is wrong. We need the transitive closure of the
+        # tree (maybe forrest?).
         executions_sql = """
-SELECT sup.worker_id FROM
-                     supervises_executions AS sup JOIN query AS q
-                     ON sup.supervisor_id = q.supervisor_execution_id
+SELECT sup.child_id FROM
+                     initiates_executions AS sup JOIN query AS q
+                     ON sup.parent_id = q.root_execution_id
        WHERE q.query_id=%(qid)s
 """
 
-        executions = self._db.execute_query(executions_sql, {'qid': qid})
-        result = utils.DLtoLD(executions)
+        result = self._db.execute_query(executions_sql, {'qid': qid})
 
-        if len(result) == 0:
+        if len(result["child_id"]) == 0:
             resp.status = falcon.HTTP_404
             return
 
