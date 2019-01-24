@@ -40,6 +40,45 @@ class SingleQuery(object):
     def __init__(self, db):
         self._db = db
 
+    def on_put(self, req, resp, qid):
+        if req.content_length:
+            doc = json.load(req.stream)
+            label = doc.get('label')
+            if label is None:
+                # Bad request
+                msg = 'Field "label" required in body'
+                doc = {
+                    'links': {
+                        'url': req.url,
+                    },
+                    'error': msg,
+                }
+                resp.status = falcon.HTTP_400
+                resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+                LOGGER.error(msg)
+                return
+        else:
+            # Bad request
+            msg = 'JSON body is required for this call'
+            doc = {
+                'links': {
+                    'url': req.url,
+                },
+                'error': msg,
+            }
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+            LOGGER.error(msg)
+            return
+
+        # BUG @ mal_analytics: the following sql has an error (qid is
+        # an unknown identifier), but we are not notified that
+        # something has gone wrong
+        # add_label_sql = "UPDATE query SET query_label=%(label)s WHERE qid=%(qid)s"
+
+        add_label_sql = "UPDATE query SET query_label=%(label)s WHERE query_id=%(qid)s"
+        self._db.execute_query(add_label_sql, dict([("label", label), ("qid", qid)]))
+
     def on_get(self, req, resp, qid):
         query_sql = "SELECT * FROM query WHERE query_id=%(qid)s"
 
