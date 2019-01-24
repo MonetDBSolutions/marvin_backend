@@ -19,8 +19,8 @@ class Queries(object):
         self._db = db
 
     def on_get(self, req, resp):
-        all_queries_q = "SELECT * from query"
-        all_queries = self._db.execute_query(all_queries_q)
+        all_queries_sql = "SELECT * from query"
+        all_queries = self._db.execute_query(all_queries_sql)
         result = utils.DLtoLD(all_queries)
 
         doc = {
@@ -41,11 +41,10 @@ class SingleQuery(object):
         self._db = db
 
     def on_get(self, req, resp, qid):
-        query_q = "SELECT * FROM query WHERE query_id=%(qid)s"
+        query_sql = "SELECT * FROM query WHERE query_id=%(qid)s"
 
-        query = self._db.execute_query(query_q, {'qid': qid})
-        result_t = dict([(k, v.tolist()) for k, v in query.items()])
-        result = utils.DLtoLD(result_t)
+        query = self._db.execute_query(query_sql, {'qid': qid})
+        result = utils.DLtoLD(query)
 
         if len(result) == 0:
             # No query with the given qid. This is a 404 error.
@@ -55,7 +54,7 @@ class SingleQuery(object):
         if len(result) != 1:
             # This cannot happen unless the db constraints in
             # mal_analytics have somehow failed.
-            msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_q, qid, len(result))
+            msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_sql, qid, len(result))
             LOGGER.error(msg)
             doc = {
                 'links': {
