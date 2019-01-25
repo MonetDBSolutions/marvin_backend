@@ -16,11 +16,12 @@ pytest = "==3.4.2"
 pytest-runner = "==2.11.1"
 Sphinx = "==1.7.1"
 falcon = ">=1.4.1"
-mal-analytics = {editable = true,path = "./../mal_analytics"}
 ipython = "*"
 gunicorn = "*"
 httpie = "*"
 marvin-backend = {editable = true,path = "."}
+trepan3k = "*"
+mal-analytics = {editable = true,path = "./../mal_analytics"}
 
 [requires]
 python_version = "3.7"
