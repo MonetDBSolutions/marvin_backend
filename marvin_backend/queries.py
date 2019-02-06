@@ -121,27 +121,39 @@ class QueryExecutions(object):
         self._db = db
 
     def on_get(self, req, resp, qid):
-        # The query is wrong. We need the transitive closure of the
-        # tree (maybe forrest?).
-        executions_sql = """
-SELECT sup.child_id FROM
-                     initiates_executions AS sup JOIN query AS q
-                     ON sup.parent_id = q.root_execution_id
-       WHERE q.query_id=%(qid)s
-"""
+#         # The query is wrong. We need the transitive closure of the
+#         # tree (maybe forrest?).
+#         executions_sql = """
+# SELECT sup.child_id FROM
+#                      initiates_executions AS sup JOIN query AS q
+#                      ON sup.parent_id = q.root_execution_id
+#        WHERE q.query_id=%(qid)s
+# """
 
-        result = self._db.execute_query(executions_sql, {'qid': qid})
+        edges_sql = "SELECT * FROM initiates_executions"
+        start_node_sql = """
+SELECT e.execution_id FROM
+            mal_execution AS e JOIN query AS q
+            ON e.execution_id = q.root_execution_id
+        WHERE q.query_id=%(qid)s"""
 
-        if len(result["child_id"]) == 0:
+        exec_graph_edges = self._db.execute_query(edges_sql, {'qid': qid})
+        start_node = self._db.execute_query(start_node_sql, {'qid': qid})['execution_id'][0]
+        LOGGER.debug("%s", start_node)
+        LOGGER.debug("%s", exec_graph_edges)
+
+        if len(exec_graph_edges["child_id"]) == 0:
             resp.status = falcon.HTTP_404
             return
+
+        execution_ids = self._bfs(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
 
         doc = {
             'links': {
                 'url': req.url,
             },
-            'data': result,
-            'data_length': len(result),
+            'data': execution_ids,
+            'data_length': len(execution_ids),
         }
 
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
