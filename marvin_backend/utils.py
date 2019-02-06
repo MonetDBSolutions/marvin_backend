@@ -4,9 +4,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 # Copyright MonetDB Solutions B.V. 2018-2019
+from collections import deque
 import json
+import logging
 import numpy as np
 
+LOGGER = logging.getLogger(__name__)
 
 def DLtoLD(dl):
     """Turn a dict of lists into a list of dicts
@@ -75,3 +78,44 @@ class NumpyJSONEncoder(json.JSONEncoder):
             # array is a subtype of np.ndarray
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
+# Graph utilities: To find all the executions associated with a given
+# query we need to traverse the execution graph starting at the
+# root_exeqution_id of the query.
+
+# The representation of the graph is just a list of edges. Edges are
+# represented by a pair of numbers, that are taken to mean nodes. That
+# is if (1, 2) is in the list of edges, then there is an edge from
+# node 1 to node 2.
+
+class SimpleGraph(object):
+    def __init__(self, edges):
+        self._edges = edges
+
+    def bfs(self, start_node):
+        ret = list()
+        q = deque()
+        q.append(start_node)
+
+        while len(q) != 0:
+            LOGGER.debug(q)
+            n = q.popleft()
+            ret.append(n)
+            neighbors = [self._head(e) for e in self._edges if self._tail(e) == n and self._head(e) not in ret]
+            LOGGER.debug("%d->%s", n, neighbors)
+            q.extend(neighbors)
+
+        return ret
+
+    def _head(self, edge):
+        return edge[1]
+
+    def _tail(self, edge):
+        # edge is a dict with 2 keys: parent_id and child_id. The edge
+        # is in the sense parent->child.
+        return edge[0]
+
+# The interface of the graph tools to the rest of the system.
+def find_query_execution_ids(query_root_execution, execution_relation):
+    g = SimpleGraph(list(zip(execution_relation['parent_id'], execution_relation['child_id'])))
+    return g.bfs(query_root_execution['execution_id'][0])

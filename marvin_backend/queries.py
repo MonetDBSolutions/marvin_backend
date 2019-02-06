@@ -132,7 +132,7 @@ class QueryExecutions(object):
 #        WHERE q.query_id=%(qid)s
 # """
 
-        edges_sql = "SELECT * FROM initiates_executions"
+        edges_sql = "SELECT parent_id, child_id FROM initiates_executions"
         start_node_sql = """
 SELECT e.execution_id FROM
             mal_execution AS e JOIN query AS q
@@ -140,15 +140,16 @@ SELECT e.execution_id FROM
         WHERE q.query_id=%(qid)s"""
 
         exec_graph_edges = self._db.execute_query(edges_sql, {'qid': qid})
-        start_node = self._db.execute_query(start_node_sql, {'qid': qid})['execution_id'][0]
-        LOGGER.debug("%s", start_node)
-        LOGGER.debug("%s", exec_graph_edges)
+        start_node = self._db.execute_query(start_node_sql, {'qid': qid})
+
+        LOGGER.debug("Start node: %s", start_node)
+        LOGGER.debug("Edges data: %s", exec_graph_edges)
 
         if len(exec_graph_edges["child_id"]) == 0:
             resp.status = falcon.HTTP_404
             return
 
-        execution_ids = self._bfs(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
+        execution_ids = find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
 
         doc = {
             'links': {
