@@ -6,6 +6,8 @@
 # Copyright MonetDB Solutions B.V. 2018-2019
 import json
 import logging
+# TODO: Refactor001 remove this
+from collections import deque
 
 import falcon
 
@@ -73,7 +75,7 @@ class SingleQuery(object):
 
         # BUG @ mal_analytics: the following sql has an error (qid is
         # an unknown identifier), but we are not notified that
-        # something has gone wrong
+        # something has gone wrong. We need to get an exception here.
         # add_label_sql = "UPDATE query SET query_label=%(label)s WHERE qid=%(qid)s"
 
         add_label_sql = "UPDATE query SET query_label=%(label)s WHERE query_id=%(qid)s"
@@ -158,3 +160,36 @@ SELECT e.execution_id FROM
 
         resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
         resp.status = falcon.HTTP_200
+
+    # TODO: Refactor001 this. It needs to move out of this class
+    @staticmethod
+    def _tail(edge):
+        # edge is a dict with 2 keys: parent_id and child_id. The edge
+        # is in the sense parent->child.
+        return edge[0]
+
+    @staticmethod
+    def _head(edge):
+        return edge[1]
+
+    @staticmethod
+    def _transform(edges_data):
+        return zip(edges_data['parent_id'], edges_data['child_id'])
+
+    @staticmethod
+    def _bfs(start_node, edges_data):
+        ret = list()
+        q = deque()
+        q.append(start_node)
+
+        LOGGER.debug("edges_data = %s", QueryExecutions._transform(edges_data))
+        while len(q) != 0:
+            LOGGER.debug("q = %s", q)
+            n = q.popleft()
+            ret.append(n)
+            neighbors = [QueryExecutions._head(e) for e in QueryExecutions._transform(edges_data) if QueryExecutions._tail(e) == n and QueryExecutions._head(e) not in ret]
+            LOGGER.debug("head = %d tails = %s", n, neighbors)
+            q.extend(neighbors)
+            LOGGER.debug("q = %s", q)
+
+        return ret
