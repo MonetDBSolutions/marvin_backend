@@ -6,12 +6,10 @@
 # Copyright MonetDB Solutions B.V. 2018-2019
 import json
 import logging
-# TODO: Refactor001 remove this
-from collections import deque
 
 import falcon
 
-from marvin_backend import utils
+from marvin_backend.utils import DLtoLD, LDtoDL, NumpyJSONEncoder, find_query_execution_ids
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +21,7 @@ class Queries(object):
     def on_get(self, req, resp):
         all_queries_sql = "SELECT * from query"
         all_queries = self._db.execute_query(all_queries_sql)
-        result = utils.DLtoLD(all_queries)
+        result = DLtoLD(all_queries)
 
         doc = {
             'links': {
@@ -34,7 +32,7 @@ class Queries(object):
         }
 
         # TODO: pagination
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
         resp.status = falcon.HTTP_200
 
 
@@ -56,7 +54,7 @@ class SingleQuery(object):
                     'error': msg,
                 }
                 resp.status = falcon.HTTP_400
-                resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+                resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
                 LOGGER.error(msg)
                 return
         else:
@@ -69,7 +67,7 @@ class SingleQuery(object):
                 'error': msg,
             }
             resp.status = falcon.HTTP_400
-            resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+            resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
             LOGGER.error(msg)
             return
 
@@ -85,7 +83,7 @@ class SingleQuery(object):
         query_sql = "SELECT * FROM query WHERE query_id=%(qid)s"
 
         query = self._db.execute_query(query_sql, {'qid': qid})
-        result = utils.DLtoLD(query)
+        result = DLtoLD(query)
 
         if len(result) == 0:
             # No query with the given qid. This is a 404 error.
@@ -114,7 +112,7 @@ class SingleQuery(object):
             'data_length': len(result),
         }
 
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
         resp.status = falcon.HTTP_200
 
 
@@ -159,38 +157,5 @@ SELECT e.execution_id FROM
             'data_length': len(execution_ids),
         }
 
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
         resp.status = falcon.HTTP_200
-
-    # TODO: Refactor001 this. It needs to move out of this class
-    @staticmethod
-    def _tail(edge):
-        # edge is a dict with 2 keys: parent_id and child_id. The edge
-        # is in the sense parent->child.
-        return edge[0]
-
-    @staticmethod
-    def _head(edge):
-        return edge[1]
-
-    @staticmethod
-    def _transform(edges_data):
-        return zip(edges_data['parent_id'], edges_data['child_id'])
-
-    @staticmethod
-    def _bfs(start_node, edges_data):
-        ret = list()
-        q = deque()
-        q.append(start_node)
-
-        LOGGER.debug("edges_data = %s", QueryExecutions._transform(edges_data))
-        while len(q) != 0:
-            LOGGER.debug("q = %s", q)
-            n = q.popleft()
-            ret.append(n)
-            neighbors = [QueryExecutions._head(e) for e in QueryExecutions._transform(edges_data) if QueryExecutions._tail(e) == n and QueryExecutions._head(e) not in ret]
-            LOGGER.debug("head = %d tails = %s", n, neighbors)
-            q.extend(neighbors)
-            LOGGER.debug("q = %s", q)
-
-        return ret
