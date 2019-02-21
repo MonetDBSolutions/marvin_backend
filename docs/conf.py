@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Marvin 2.0 Backend'
-copyright = u"2018, Panagiotis Koutsourakis"
+copyright = u"2018-2019, MonetDB Solutions B.V."
 author = u"Panagiotis Koutsourakis"
 
 # The version info for the project you're documenting, acts as replacement
@@ -158,6 +158,3 @@ texinfo_documents = [
      'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
