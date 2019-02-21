@@ -11,6 +11,7 @@ import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
+
 def DLtoLD(dl):
     """Turn a dict of lists into a list of dicts
 
@@ -79,6 +80,7 @@ class NumpyJSONEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
+
 # Graph utilities: To find all the executions associated with a given
 # query we need to traverse the execution graph starting at the
 # root_exeqution_id of the query.
@@ -87,7 +89,6 @@ class NumpyJSONEncoder(json.JSONEncoder):
 # represented by a pair of numbers, that are taken to mean nodes. That
 # is if (1, 2) is in the list of edges, then there is an edge from
 # node 1 to node 2.
-
 class SimpleGraph(object):
     def __init__(self, edges):
         self._edges = edges
@@ -114,6 +115,7 @@ class SimpleGraph(object):
         # edge is a dict with 2 keys: parent_id and child_id. The edge
         # is in the sense parent->child.
         return edge[0]
+
 
 # The interface of the graph tools to the rest of the system.
 def find_query_execution_ids(query_root_execution, execution_relation):

@@ -121,15 +121,6 @@ class QueryExecutions(object):
         self._db = db
 
     def on_get(self, req, resp, qid):
-#         # The query is wrong. We need the transitive closure of the
-#         # tree (maybe forrest?).
-#         executions_sql = """
-# SELECT sup.child_id FROM
-#                      initiates_executions AS sup JOIN query AS q
-#                      ON sup.parent_id = q.root_execution_id
-#        WHERE q.query_id=%(qid)s
-# """
-
         edges_sql = "SELECT parent_id, child_id FROM initiates_executions"
         start_node_sql = """
 SELECT e.execution_id FROM
@@ -137,11 +128,16 @@ SELECT e.execution_id FROM
             ON e.execution_id = q.root_execution_id
         WHERE q.query_id=%(qid)s"""
 
+        all_nodes = self._db.execute_query("SELECT execution_id FROM mal_execution")
         exec_graph_edges = self._db.execute_query(edges_sql, {'qid': qid})
         start_node = self._db.execute_query(start_node_sql, {'qid': qid})
 
+        LOGGER.debug("*" * 30)
+        LOGGER.debug("All nodes: %s", all_nodes['execution_id'])
+        LOGGER.debug("All edges: %s", list(zip(exec_graph_edges['parent_id'], exec_graph_edges['child_id'])))
         LOGGER.debug("Start node: %s", start_node)
         LOGGER.debug("Edges data: %s", exec_graph_edges)
+        LOGGER.debug("*" * 30)
 
         if len(exec_graph_edges["child_id"]) == 0:
             resp.status = falcon.HTTP_404

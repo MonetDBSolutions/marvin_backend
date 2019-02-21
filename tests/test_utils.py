@@ -6,15 +6,16 @@
 # Copyright MonetDB Solutions B.V. 2018-2019
 from marvin_backend import utils
 
+
 class TestUtils(object):
     def test_dict_to_list(self):
-        d = {'key1':[1, 2], 'key2':['a', 'b']}
+        d = {'key1': [1, 2], 'key2': ['a', 'b']}
 
-        l = utils.DLtoLD(d)
-        assert l == [{'key1': 1, 'key2': 'a'}, {'key1': 2, 'key2': 'b'}]
+        ld = utils.DLtoLD(d)
+        assert ld == [{'key1': 1, 'key2': 'a'}, {'key1': 2, 'key2': 'b'}]
 
     def test_list_to_dict(self):
-        l = [{'key1': 1, 'key2': 'a'}, {'key1': 2, 'key2': 'b'}]
+        ld = [{'key1': 1, 'key2': 'a'}, {'key1': 2, 'key2': 'b'}]
 
-        d = utils.LDtoDL(l)
-        assert d == {'key1':[1, 2], 'key2':['a', 'b']}
+        d = utils.LDtoDL(ld)
+        assert d == {'key1': [1, 2], 'key2': ['a', 'b']}
