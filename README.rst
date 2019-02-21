@@ -1,3 +1,7 @@
+.. image:: https://www.codefactor.io/repository/github/monetdbsolutions/marvin_backend/badge/master
+   :target: https://www.codefactor.io/repository/github/monetdbsolutions/marvin_backend/overview/master
+   :alt: CodeFactor
+
 ==================
 Marvin 2.0 Backend
 ==================
