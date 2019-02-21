@@ -85,7 +85,7 @@ class SingleQuery(object):
         query = self._db.execute_query(query_sql, {'qid': qid})
         result = DLtoLD(query)
 
-        if len(result) == 0:
+        if not result:
             # No query with the given qid. This is a 404 error.
             resp.status = falcon.HTTP_404
             return
@@ -139,7 +139,7 @@ SELECT e.execution_id FROM
         LOGGER.debug("Edges data: %s", exec_graph_edges)
         LOGGER.debug("*" * 30)
 
-        if len(exec_graph_edges["child_id"]) == 0:
+        if not exec_graph_edges["child_id"]:
             resp.status = falcon.HTTP_404
             return
 
