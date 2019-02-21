@@ -12,3 +12,13 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Added
 *****
+* Implemented /queries enpoints. Specifically:
+
+  ``/queries``
+    Returns a list of all the queries currently in the database.
+
+  ``/queries/{id}``
+    Returns a description of the query with the given ``{id}``.
+
+  ``/queries/{id}/executions``
+    Returns a list of executions associated with the given ``{id}``.
