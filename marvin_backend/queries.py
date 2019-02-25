@@ -40,7 +40,7 @@ class SingleQuery(object):
     def __init__(self, db):
         self._db = db
 
-    def on_put(self, req, resp, qid):
+    def on_patch(self, req, resp, qid):
         if req.content_length:
             doc = json.load(req.stream)
             label = doc.get('label')
