@@ -15,16 +15,20 @@ LOGGER = logging.getLogger(__name__)
 def DLtoLD(dl):
     """Turn a dict of lists into a list of dicts
 
-Example:
-``DLtoLD({'key1':[1, 2], 'key2':['a', 'b']}) = [{'key1':1, 'key2':'a'}, {'key1':2, 'key2':'b'}]``
+    This essentially transposes the representation of tabular data
+    from column based to row based.
 
-This essentially transposes the representation of tabular data from
-column based to row based.
+    Args:
+        dl: A dictionary of lists
 
-:param dl: A dictionary of lists
-:returns: A list of dictionaries
+    Returns:
+        A list of dictionaries
 
-"""
+    Examples:
+        >>> DLtoLD({'key1':[1, 2], 'key2':['a', 'b']})
+        [{'key1':1, 'key2':'a'}, {'key1':2, 'key2':'b'}]
+
+    """
 
     # 1. dl.values() => [[1, 2], ['a', 'b']]
 
@@ -49,15 +53,20 @@ column based to row based.
 def LDtoDL(ld):
     """Turn a list of dicts into a dict of lists
 
-Example:
-``LDtoDL([{'key1':1, 'key2':'a'}, {'key1':2, 'key2':'b'}}) = {'key1':[1, 2], 'key2':['a', 'b']}``
+    This essentially transposes the representation of tabular data
+    from row based to column based.
 
-This essentially transposes the representation of tabular data from
-row based to column based.
+    Args:
+        ld: A list of dictionaries with the same keys
 
-:param ld: A list of dictionaries with the same keys
-:returns: A dictionary of lists
-"""
+    Returns:
+         A dictionary of lists
+
+    Examples:
+        >>> LDtoDL([{'key1':1, 'key2':'a'}, {'key1':2, 'key2':'b'}})
+        {'key1':[1, 2], 'key2':['a', 'b']}
+
+    """
 
     return {k: [dic[k] for dic in ld] for k in ld[0]}
 

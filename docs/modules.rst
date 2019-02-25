@@ -1,5 +1,5 @@
-Modules
-=======
+marvin_backend
+==============
 
 .. toctree::
    :maxdepth: 4
