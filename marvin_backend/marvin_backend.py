@@ -41,7 +41,7 @@ def create_app(manager):
     return api
 
 
-def get_app(database_path=None):
+def get_app(database_path=None):  # pragma: no coverage
     curr_path = Path().cwd()
     # db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
     # For dev purposes
@@ -56,7 +56,7 @@ def get_app(database_path=None):
     return create_app(dbm)
 
 
-class Marvin(gunicorn.app.base.BaseApplication):
+class Marvin(gunicorn.app.base.BaseApplication):  # pragma: no coverage
     def __init__(self, app, options=None):
         self._options = options or {}
         self._application = app
@@ -73,7 +73,7 @@ class Marvin(gunicorn.app.base.BaseApplication):
         return self._application
 
 
-def parse_cli():
+def parse_cli():   # pragma: no coverage
     parser = argparse.ArgumentParser()
     parser.add_argument('--dbpath', '-d', help='Path to the database holding the traces')
 
@@ -83,7 +83,7 @@ def parse_cli():
     return parser.parse_args()
 
 
-def main():
+def main():   # pragma: no coverage
     arguments = parse_cli()
     print(arguments)
     options = {
@@ -93,5 +93,5 @@ def main():
     Marvin(get_app(arguments.dbpath), options).run()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':   # pragma: no coverage
     main()

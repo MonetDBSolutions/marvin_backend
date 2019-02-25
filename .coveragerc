@@ -1,0 +1,2 @@
+[run]
+omit = marvin_backend/__main__.py
