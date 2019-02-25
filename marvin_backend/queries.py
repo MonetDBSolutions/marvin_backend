@@ -9,7 +9,7 @@ import logging
 
 import falcon
 
-from marvin_backend.utils import DLtoLD, LDtoDL, NumpyJSONEncoder, find_query_execution_ids
+from marvin_backend.utils import DLtoLD, NumpyJSONEncoder, find_query_execution_ids
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class Queries(object):
         self._db = db
 
     def on_get(self, req, resp):
-        all_queries_sql = "SELECT * from query"
+        all_queries_sql = "SELECT * FROM query"
         all_queries = self._db.execute_query(all_queries_sql)
         result = DLtoLD(all_queries)
 
