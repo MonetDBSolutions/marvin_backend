@@ -129,7 +129,7 @@ SELECT e.execution_id FROM
         WHERE q.query_id=%(qid)s"""
 
         all_nodes = self._db.execute_query("SELECT execution_id FROM mal_execution")
-        exec_graph_edges = self._db.execute_query(edges_sql, {'qid': qid})
+        exec_graph_edges = self._db.execute_query(edges_sql)
         start_node = self._db.execute_query(start_node_sql, {'qid': qid})
 
         LOGGER.debug("*" * 30)
