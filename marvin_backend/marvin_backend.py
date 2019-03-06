@@ -16,7 +16,7 @@ import gunicorn.app.base
 from gunicorn.six import iteritems
 from mal_analytics import db_manager
 
-from marvin_backend import queries
+from marvin_backend import queries, executions
 
 """Main module."""
 
@@ -37,6 +37,15 @@ def create_app(manager):
 
     query_executions = queries.QueryExecutions(manager)
     api.add_route('/queries/{qid}/executions', query_executions)
+
+    all_executions = executions.Executions(manager)
+    api.add_route('/executions', all_executions)
+
+    single_execution = executions.SingleExecution(manager)
+    api.add_route('/executions/{eid}', single_execution)
+
+    execution_statements = executions.ExecutionStatements(manager)
+    api.add_route('/executions/{eid}/statements', execution_statements)
 
     return api
 
