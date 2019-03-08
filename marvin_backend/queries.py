@@ -9,7 +9,7 @@ import logging
 
 import falcon
 
-from marvin_backend.utils import DLtoLD, NumpyJSONEncoder, find_query_execution_ids
+from marvin_backend import utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -18,23 +18,12 @@ class Queries(object):
     def __init__(self, db):
         self._db = db
 
+    @utils.api_endpoint
     def on_get(self, req, resp):
         all_queries_sql = "SELECT * FROM query"
         all_queries = self._db.execute_query(all_queries_sql)
-        result = DLtoLD(all_queries)
 
-        doc = {
-            'links': {
-                'url': req.url,
-            },
-            'data': result,
-            'data_length': len(result),
-        }
-
-        # TODO: pagination
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
-        resp.status = falcon.HTTP_200
-
+        return all_queries
 
 class SingleQuery(object):
     def __init__(self, db):
@@ -54,7 +43,7 @@ class SingleQuery(object):
                     'error': msg,
                 }
                 resp.status = falcon.HTTP_400
-                resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
+                resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
                 LOGGER.error(msg)
                 return
         else:
@@ -67,7 +56,7 @@ class SingleQuery(object):
                 'error': msg,
             }
             resp.status = falcon.HTTP_400
-            resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
+            resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
             LOGGER.error(msg)
             return
 
@@ -79,41 +68,15 @@ class SingleQuery(object):
         add_label_sql = "UPDATE query SET query_label=%(label)s WHERE query_id=%(qid)s"
         self._db.execute_query(add_label_sql, dict([("label", label), ("qid", qid)]))
 
+    @utils.api_endpoint_singleton_result
+    @utils.api_endpoint_404_on_empty
+    @utils.api_endpoint
     def on_get(self, req, resp, qid):
         query_sql = "SELECT * FROM query WHERE query_id=%(qid)s"
 
         query = self._db.execute_query(query_sql, {'qid': qid})
-        result = DLtoLD(query)
-
-        if not result:
-            # No query with the given qid. This is a 404 error.
-            resp.status = falcon.HTTP_404
-            return
-
-        if len(result) != 1:
-            # This cannot happen unless the db constraints in
-            # mal_analytics have somehow failed.
-            msg = 'Query "{}" (qid={}) returned {} results. We were expecting 1.'.format(query_sql, qid, len(result))
-            LOGGER.error(msg)
-            doc = {
-                'links': {
-                    'url': req.url,
-                },
-                'error': msg
-            }
-            resp.status = falcon.HTTP_500
-            return
-
-        doc = {
-            'links': {
-                'url': req.url,
-            },
-            'data': result,
-            'data_length': len(result),
-        }
-
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
-        resp.status = falcon.HTTP_200
+        LOGGER.debug("QUERY=%s", query)
+        return query
 
 
 class QueryExecutions(object):
@@ -143,7 +106,7 @@ SELECT e.execution_id FROM
             resp.status = falcon.HTTP_404
             return
 
-        execution_ids = find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
+        execution_ids = utils.find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
 
         doc = {
             'links': {
@@ -153,5 +116,5 @@ SELECT e.execution_id FROM
             'data_length': len(execution_ids),
         }
 
-        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=utils.NumpyJSONEncoder)
         resp.status = falcon.HTTP_200

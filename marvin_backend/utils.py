@@ -5,9 +5,12 @@
 #
 # Copyright MonetDB Solutions B.V. 2018-2019
 from collections import deque
+import functools
 import json
 import logging
 import numpy as np
+
+import falcon
 
 LOGGER = logging.getLogger(__name__)
 
@@ -130,3 +133,58 @@ class SimpleGraph(object):
 def find_query_execution_ids(query_root_execution, execution_relation):
     g = SimpleGraph(list(zip(execution_relation['parent_id'], execution_relation['child_id'])))
     return g.bfs(query_root_execution['execution_id'][0])
+
+
+def api_endpoint(func):
+    @functools.wraps(func)
+    def api_endpoint_impl(cls, req, resp, *args, **kwargs):
+        result = DLtoLD(func(cls, req, resp, *args, **kwargs))
+
+        print("API DECORATOR", result)
+        doc = {
+            'links': {
+                'url': req.url,
+            },
+            'data': result,
+            'data_length': len(result),
+        }
+
+        # TODO: pagination
+        resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
+        resp.status = falcon.HTTP_200
+
+        return result
+
+    return api_endpoint_impl
+
+def api_endpoint_404_on_empty(func):
+    @functools.wraps(func)
+    def api_endpoint_404_on_empty_impl(cls, req, resp, *args, **kwargs):
+        result = func(cls, req, resp, *args, **kwargs)
+
+        print("EMPTY DECORATOR", result)
+        if not result:
+            resp.status = falcon.HTTP_404
+
+        return result
+    return api_endpoint_404_on_empty_impl
+
+def api_endpoint_singleton_result(func):
+    @functools.wraps(func)
+    def api_endpoint_singleton_result_impl(cls, req, resp, *args, **kwargs):
+        result = func(cls, req, resp, *args, **kwargs)
+
+        print("SINGLETON DECORATOR", result)
+        if result and  len(result) > 1:
+            msg = "Expecting single result, but got {}.".format(len(result))
+            doc = {
+                'links': {
+                    'url': req.url,
+                },
+                'error': msg,
+            }
+
+            resp.status = falcon.HTTP_500
+            return result
+
+    return api_endpoint_singleton_result_impl
