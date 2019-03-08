@@ -48,7 +48,7 @@ def create_app(manager):
     api.add_route('/executions/{eid}/statements', execution_statements)
 
     # Mostly for debugging, but could be useful for users as well.
-    arbitrary_sql = developer.Query(manager)
+    arbitrary_sql = developer.SQLQuery(manager)
     api.add_route('/developer/query', arbitrary_sql)
 
     return api

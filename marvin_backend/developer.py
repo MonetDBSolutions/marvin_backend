@@ -12,7 +12,7 @@ import falcon
 from marvin_backend.utils import DLtoLD, NumpyJSONEncoder, find_query_execution_ids
 
 
-class Query(object):
+class SQLQuery(object):
     """Endpoints to execute arbitrary queries against the database"""
     def __init__(self, db):
         self._db = db
