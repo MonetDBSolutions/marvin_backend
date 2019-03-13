@@ -1,0 +1,902 @@
+# -*- restclient -*-
+
+# What queries are in the database?
+GET http://localhost:8000/queries/
+# {
+#   "links": {
+#     "url": "http://localhost:8000/queries"
+#   },
+#   "data": [
+#     {
+#       "query_id": 1,
+#       "query_text": "select * from local_table as l join merge_table as m on l.j=m.i;",
+#       "query_label": null,
+#       "root_execution_id": 1
+#     },
+#     {
+#       "query_id": 2,
+#       "query_text": "select l_returnflag, l_linestatus, sum(l_quantity) as sum_qty, sum(l_extendedprice) as sum_base_price, sum(l_extendedprice * (1 - l_discount)) as sum_disc_price, sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) as sum_charge, avg(l_quantity) as avg_qty, avg(l_extendedprice) as avg_price, avg(l_discount) as avg_disc, count(*) as count_order from lineitem where l_shipdate <= date \\\\'1998-12-01 00:00:00\\\\' - interval\\\\'2181\\\\' day (3) group by l_returnflag, l_linestatus order by l_returnflag, l_linestatus;",
+#       "query_label": null,
+#       "root_execution_id": 34
+#     }
+#   ],
+#   "data_length": 2
+# }
+
+
+# Show metadata for query 1
+GET http://localhost:8000/queries/1/
+# {
+#   "links": {
+#     "url": "http://localhost:8000/queries/1"
+#   },
+#   "data": [
+#     {
+#       "query_id": 1,
+#       "query_text": "select * from local_table as l join merge_table as m on l.j=m.i;",
+#       "query_label": null,
+#       "root_execution_id": 1
+#     }
+#   ],
+#   "data_length": 1
+# }
+
+# Set the mnemonic label of query 1
+PATCH http://localhost:8000/queries/1/
+Content-Type: application/json
+{"label":"distributed query"}
+# --- no output ---
+
+# Get the metadata again to verify that the label changed
+GET http://localhost:8000/queries/1/
+# {
+#   "links": {
+#     "url": "http://localhost:8000/queries/1"
+#   },
+#   "data": [
+#     {
+#       "query_id": 1,
+#       "query_text": "select * from local_table as l join merge_table as m on l.j=m.i;",
+#       "query_label": "distributed query",
+#       "root_execution_id": 1
+#     }
+#   ],
+#   "data_length": 1
+# }
+
+# Show the execution ids for query 1
+# mserver5 BUG: not all executions are reachable here
+GET http://localhost:8000/queries/1/executions
+# {
+#   "links": {
+#     "url": "http://localhost:8000/queries/1/executions"
+#   },
+#   "data": [
+#     1,
+#     2,
+#     3,
+#     14,
+#     29
+#   ],
+#   "data_length": 5
+# }
+
+# Show all the executions in the database
+GET http://localhost:8000/executions
+# {
+#   "links": {
+#     "url": "http://localhost:8000/executions"
+#   },
+#   "data": [
+#     {
+#       "execution_id": 1,
+#       "server_session": "f75f218e-e06f-4a8c-92cf-a4bebe0b3adc",
+#       "tag": 19,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "s4_1"
+#     },
+#     {
+#       "execution_id": 2,
+#       "server_session": "f75f218e-e06f-4a8c-92cf-a4bebe0b3adc",
+#       "tag": 20,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "L1"
+#     },
+#     {
+#       "execution_id": 3,
+#       "server_session": "f75f218e-e06f-4a8c-92cf-a4bebe0b3adc",
+#       "tag": 21,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "L2"
+#     },
+#     {
+#       "execution_id": 4,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 28,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 5,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 29,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 6,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 30,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 7,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 31,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 8,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 32,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 9,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 33,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 10,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 34,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 11,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 35,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 12,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 36,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 13,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 37,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 14,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 38,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 15,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 39,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 16,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 40,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 17,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 41,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "l1"
+#     },
+#     {
+#       "execution_id": 18,
+#       "server_session": "a2633234-182c-4ff7-b38d-49f93a60b13a",
+#       "tag": 42,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 19,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 28,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 20,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 29,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 21,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 30,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 22,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 31,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 23,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 32,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 24,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 33,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 25,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 34,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 26,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 35,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 27,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 36,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 28,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 37,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 29,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 38,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 30,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 39,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 31,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 40,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 32,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 41,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "l2"
+#     },
+#     {
+#       "execution_id": 33,
+#       "server_session": "0930fd14-b37b-4960-96e4-af785c9ab375",
+#       "tag": 42,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "main"
+#     },
+#     {
+#       "execution_id": 34,
+#       "server_session": "89f543c3-beae-4b78-b3c0-b9f041520a64",
+#       "tag": 16,
+#       "server_version": "11.32.0 (hg id: 903396fca5 (git))",
+#       "user_function": "s0_1"
+#     }
+#   ],
+#   "data_length": 34
+# }
+
+# Show the metadata for execution 1
+GET http://localhost:8000/executions/1/
+# {
+#   "links": {
+#     "url": "http://localhost:8000/executions/1"
+#   },
+#   "data": [
+#     {
+#       "execution_id": 1,
+#       "server_session": "f75f218e-e06f-4a8c-92cf-a4bebe0b3adc",
+#       "tag": 19,
+#       "server_version": "11.33.0 (hg id: bd6cdf71b698)",
+#       "user_function": "s4_1"
+#     }
+#   ],
+#   "data_length": 1
+# }
+
+# Show the statements for execution 1
+GET http://localhost:8000/executions/1/statements
+# {
+#   "links": {
+#     "url": "http://localhost:8000/executions/1/statements"
+#   },
+#   "data": [
+#     {
+#       "pc": 0,
+#       "short_statement": "function user.s4_1( )",
+#       "start_time": 8157762565,
+#       "end_time": 8157817331,
+#       "duration": 54766,
+#       "thread": 5,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 1,
+#       "short_statement": "define( \"select * from local_table as l join merge_table as m on l.j=m.i;\", \"default_pipe\", 57 )",
+#       "start_time": 8157763051,
+#       "end_time": 8157763370,
+#       "duration": 319,
+#       "thread": 5,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 2,
+#       "short_statement": "X_138=false := dataflow( )",
+#       "start_time": 8157763691,
+#       "end_time": 8157816644,
+#       "duration": 52953,
+#       "thread": 5,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 25,
+#       "short_statement": "X_56[0]:= new( nil )",
+#       "start_time": 8157764246,
+#       "end_time": 8157764715,
+#       "duration": 469,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 32,
+#       "short_statement": "X_61[0]:= new( nil )",
+#       "start_time": 8157764278,
+#       "end_time": 8157764815,
+#       "duration": 537,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 31,
+#       "short_statement": "X_62[0]:= new( nil )",
+#       "start_time": 8157764297,
+#       "end_time": 8157764818,
+#       "duration": 521,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 3,
+#       "short_statement": "X_47[0]:= new( nil )",
+#       "start_time": 8157764541,
+#       "end_time": 8157764946,
+#       "duration": 405,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 30,
+#       "short_statement": "X_63[0]:= new( nil )",
+#       "start_time": 8157765087,
+#       "end_time": 8157765475,
+#       "duration": 388,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 35,
+#       "short_statement": "X_69[1]:= append( X_62[1], \"int\" )",
+#       "start_time": 8157765229,
+#       "end_time": 8157765694,
+#       "duration": 465,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 34,
+#       "short_statement": "X_67[1]:= append( X_61[1], \"j\" )",
+#       "start_time": 8157765234,
+#       "end_time": 8157765721,
+#       "duration": 487,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 4,
+#       "short_statement": "X_4=0 := mvc( )",
+#       "start_time": 8157765281,
+#       "end_time": 8157765587,
+#       "duration": 306,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 36,
+#       "short_statement": "X_71[1]:= append( X_63[1], 32 )",
+#       "start_time": 8157765818,
+#       "end_time": 8157766234,
+#       "duration": 416,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 5,
+#       "short_statement": "C_5[4]:= tid( X_4=0 , \"sys\", \"local_table\" )",
+#       "start_time": 8157765861,
+#       "end_time": 8157766321,
+#       "duration": 460,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 40,
+#       "short_statement": "X_78[2]:= append( X_69[2], \"char\" )",
+#       "start_time": 8157766125,
+#       "end_time": 8157766590,
+#       "duration": 465,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 39,
+#       "short_statement": "X_76[2]:= append( X_67[2], \"s\" )",
+#       "start_time": 8157766134,
+#       "end_time": 8157766597,
+#       "duration": 463,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 41,
+#       "short_statement": "X_80[2]:= append( X_71[2], 1 )",
+#       "start_time": 8157766662,
+#       "end_time": 8157767065,
+#       "duration": 403,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 8,
+#       "short_statement": "X_26[2]:= L1( )",
+#       "start_time": 8157766808,
+#       "end_time": 8157812911,
+#       "duration": 46103,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 44,
+#       "short_statement": "X_85[3]:= append( X_76[3], \"i\" )",
+#       "start_time": 8157767033,
+#       "end_time": 8157767493,
+#       "duration": 460,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 45,
+#       "short_statement": "X_87[3]:= append( X_78[3], \"int\" )",
+#       "start_time": 8157767042,
+#       "end_time": 8157767501,
+#       "duration": 459,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 29,
+#       "short_statement": "X_64[0]:= new( nil )",
+#       "start_time": 8157767951,
+#       "end_time": 8157771866,
+#       "duration": 3915,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 28,
+#       "short_statement": "X_60[0]:= new( nil )",
+#       "start_time": 8157767962,
+#       "end_time": 8157768465,
+#       "duration": 503,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 46,
+#       "short_statement": "X_88[3]:= append( X_80[3], 32 )",
+#       "start_time": 8157768095,
+#       "end_time": 8157768547,
+#       "duration": 452,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 33,
+#       "short_statement": "X_65[1]:= append( X_60[1], \".l\" )",
+#       "start_time": 8157768781,
+#       "end_time": 8157769239,
+#       "duration": 458,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 6,
+#       "short_statement": "X_8[4]:= bind( X_4=0 , \"sys\", \"local_table\", \"j\", 0 )",
+#       "start_time": 8157769012,
+#       "end_time": 8157769581,
+#       "duration": 569,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 38,
+#       "short_statement": "X_75[2]:= append( X_65[2], \".l\" )",
+#       "start_time": 8157769755,
+#       "end_time": 8157770682,
+#       "duration": 927,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 14,
+#       "short_statement": "X_18[4]:= bind( X_4=0 , \"sys\", \"local_table\", \"s\", 0 )",
+#       "start_time": 8157770156,
+#       "end_time": 8157770650,
+#       "duration": 494,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 43,
+#       "short_statement": "X_83[3]:= append( X_75[3], \".m\" )",
+#       "start_time": 8157771086,
+#       "end_time": 8157771751,
+#       "duration": 665,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 15,
+#       "short_statement": "X_24[4]:= projection( C_5[4], X_18[4] )",
+#       "start_time": 8157771305,
+#       "end_time": 8157771813,
+#       "duration": 508,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 22,
+#       "short_statement": "X_52[0]:= new( nil )",
+#       "start_time": 8157772241,
+#       "end_time": 8157772642,
+#       "duration": 401,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 37,
+#       "short_statement": "X_73[1]:= append( X_64[1], 0 )",
+#       "start_time": 8157772264,
+#       "end_time": 8157772708,
+#       "duration": 444,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 11,
+#       "short_statement": "X_39[2]:= L2( )",
+#       "start_time": 8157772293,
+#       "end_time": 8157815099,
+#       "duration": 42806,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 42,
+#       "short_statement": "X_82[2]:= append( X_73[2], 0 )",
+#       "start_time": 8157773111,
+#       "end_time": 8157773559,
+#       "duration": 448,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 7,
+#       "short_statement": "X_17[4]:= projection( C_5[4], X_8[4] )",
+#       "start_time": 8157773140,
+#       "end_time": 8157773674,
+#       "duration": 534,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 47,
+#       "short_statement": "X_89[3]:= append( X_82[3], 0 )",
+#       "start_time": 8157773992,
+#       "end_time": 8157774412,
+#       "duration": 420,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 49,
+#       "short_statement": "pass( C_5[4] )",
+#       "start_time": 8157774119,
+#       "end_time": 8157774462,
+#       "duration": 343,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 9,
+#       "short_statement": "(X_29[2], X_30[2]):= join( X_17[4], X_26[2], nil, nil, false, nil )",
+#       "start_time": 8157813022,
+#       "end_time": 8157813253,
+#       "duration": 231,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 10,
+#       "short_statement": "X_35[2]:= projection( X_29[2], X_17[4] )",
+#       "start_time": 8157813508,
+#       "end_time": 8157813756,
+#       "duration": 248,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 19,
+#       "short_statement": "X_36[2]:= projection( X_29[2], X_24[4] )",
+#       "start_time": 8157813537,
+#       "end_time": 8157813858,
+#       "duration": 321,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 18,
+#       "short_statement": "X_37[2]:= projection( X_30[2], X_26[2] )",
+#       "start_time": 8157813539,
+#       "end_time": 8157813811,
+#       "duration": 272,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 20,
+#       "short_statement": "X_49[2]:= append( X_47[2], X_35[2], true )",
+#       "start_time": 8157813968,
+#       "end_time": 8157814195,
+#       "duration": 227,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 52,
+#       "short_statement": "pass( X_26[2] )",
+#       "start_time": 8157813976,
+#       "end_time": 8157814098,
+#       "duration": 122,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 23,
+#       "short_statement": "X_54[2]:= append( X_52[2], X_36[2], true )",
+#       "start_time": 8157814086,
+#       "end_time": 8157814322,
+#       "duration": 236,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 53,
+#       "short_statement": "pass( X_29[2] )",
+#       "start_time": 8157814252,
+#       "end_time": 8157814428,
+#       "duration": 176,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 26,
+#       "short_statement": "X_57[2]:= append( X_56[2], X_37[2], true )",
+#       "start_time": 8157814450,
+#       "end_time": 8157814636,
+#       "duration": 186,
+#       "thread": 8,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 12,
+#       "short_statement": "(X_42[2], X_43[2]):= join( X_17[4], X_39[2], nil, nil, false, nil )",
+#       "start_time": 8157815182,
+#       "end_time": 8157815355,
+#       "duration": 173,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 13,
+#       "short_statement": "X_46[2]:= projection( X_43[2], X_39[2] )",
+#       "start_time": 8157815536,
+#       "end_time": 8157815694,
+#       "duration": 158,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 17,
+#       "short_statement": "X_44[2]:= projection( X_42[2], X_17[4] )",
+#       "start_time": 8157815582,
+#       "end_time": 8157815768,
+#       "duration": 186,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 16,
+#       "short_statement": "X_45[2]:= projection( X_42[2], X_24[4] )",
+#       "start_time": 8157815586,
+#       "end_time": 8157815763,
+#       "duration": 177,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 48,
+#       "short_statement": "pass( X_39[2] )",
+#       "start_time": 8157815858,
+#       "end_time": 8157815981,
+#       "duration": 123,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 54,
+#       "short_statement": "pass( X_24[4] )",
+#       "start_time": 8157815905,
+#       "end_time": 8157816020,
+#       "duration": 115,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 50,
+#       "short_statement": "pass( X_42[2] )",
+#       "start_time": 8157815948,
+#       "end_time": 8157816079,
+#       "duration": 131,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 24,
+#       "short_statement": "X_55[4]:= append( X_54[4], X_45[2], true )",
+#       "start_time": 8157816109,
+#       "end_time": 8157816287,
+#       "duration": 178,
+#       "thread": 2,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 27,
+#       "short_statement": "X_58[4]:= append( X_57[4], X_46[2], true )",
+#       "start_time": 8157816128,
+#       "end_time": 8157816255,
+#       "duration": 127,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 21,
+#       "short_statement": "X_51[4]:= append( X_49[4], X_44[2], true )",
+#       "start_time": 8157816237,
+#       "end_time": 8157816431,
+#       "duration": 194,
+#       "thread": 9,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 51,
+#       "short_statement": "pass( X_17[4] )",
+#       "start_time": 8157816405,
+#       "end_time": 8157816514,
+#       "duration": 109,
+#       "thread": 7,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 56,
+#       "short_statement": "resultSet( X_83[3], X_85[3], X_87[3], X_88[3], X_89[3], X_51[4], X_55[4], X_58[4] )",
+#       "start_time": 8157816753,
+#       "end_time": 8157816966,
+#       "duration": 213,
+#       "thread": 5,
+#       "mal_execution_id": 1
+#     },
+#     {
+#       "pc": 57,
+#       "short_statement": "end user.s4_1",
+#       "start_time": 8157817212,
+#       "end_time": 8157817274,
+#       "duration": 62,
+#       "thread": 5,
+#       "mal_execution_id": 1
+#     }
+#   ],
+#   "data_length": 57
+# }
+
+
+# Developer sandbox...
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM profiler_event WHERE event_id=1"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM prerequisite_events WHERE consequent_event=56"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT pc, short_statement, prerequisite_event FROM profiler_event AS pr JOIN prerequisite_events AS pe ON pr.event_id = pe.consequent_event WHERE consequent_event=56"
+}
+
+# MAL Plan
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT e.pc, e.short_statement, s.relative_time as start_time, e.relative_time as end_time, e.relative_time - s.relative_time AS duration, e.thread, e.mal_execution_id FROM (SELECT * FROM profiler_event WHERE execution_state=1 AND mal_execution_id=14) AS e JOIN (SELECT * FROM profiler_event AS WHERE execution_state=0 AND mal_execution_id=14) s ON e.pc=s.pc AND e.mal_execution_id=s.mal_execution_id ORDER BY start_time ASC"
+}
