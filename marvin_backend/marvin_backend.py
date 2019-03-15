@@ -57,7 +57,8 @@ def create_app(manager):
 def get_app(database_path=None):  # pragma: no coverage
     curr_path = Path().cwd()
     # db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
-    # For dev purposes
+    # For dev purposes the default db location is at the
+    # db_path/dev_db subdirectory of the current directory.
     db_path = database_path or os.environ.get('MARVIN_DB_PATH', './db_path/dev_db')
 
     # This works both if db_path is relative, or absolute.
