@@ -26,6 +26,7 @@ class SingleExecution(object):
     def __init__(self, db):
         self._db = db
 
+    @utils.api_endpoint_404_on_empty
     @utils.api_endpoint
     def on_get(self, req, resp, eid):
         execution_sql = "SELECT * FROM mal_execution WHERE execution_id=%(eid)s"
@@ -36,6 +37,7 @@ class ExecutionStatements(object):
     def __init__(self, db):
         self._db = db
 
+    @utils.api_endpoint_404_on_empty
     @utils.api_endpoint
     def on_get(self, req, resp, eid):
         all_statements_sql = "SELECT e.pc, e.short_statement, s.relative_time as start_time, e.relative_time as end_time, e.relative_time - s.relative_time AS duration, e.thread, e.mal_execution_id, e.mal_module, e.instruction FROM (SELECT * FROM profiler_event WHERE execution_state=1 AND mal_execution_id=%(eid)s) AS e JOIN (SELECT * FROM profiler_event AS WHERE execution_state=0 AND mal_execution_id=%(eid)s) s ON e.pc=s.pc AND e.mal_execution_id=s.mal_execution_id ORDER BY start_time ASC"
