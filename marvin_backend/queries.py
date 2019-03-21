@@ -102,7 +102,7 @@ SELECT e.execution_id FROM
         LOGGER.debug("Edges data: %s", exec_graph_edges)
         LOGGER.debug("*" * 30)
 
-        if exec_graph_edges["child_id"].size == 0:
+        if exec_graph_edges["child_id"].size == 0 or not start_node["execution_id"]:
             resp.status = falcon.HTTP_404
             return
 
