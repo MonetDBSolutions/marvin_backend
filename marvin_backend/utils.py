@@ -165,8 +165,8 @@ def api_endpoint_404_on_empty(func):
         print("EMPTY DECORATOR", result)
         if not result:
             resp.status = falcon.HTTP_404
+            resp.body = None
 
-        return result
     return api_endpoint_404_on_empty_impl
 
 def api_endpoint_singleton_result(func):
