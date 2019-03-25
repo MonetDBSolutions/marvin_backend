@@ -900,3 +900,25 @@ Content-Type: application/json
 {
     "query": "SELECT e.pc, e.short_statement, s.relative_time as start_time, e.relative_time as end_time, e.relative_time - s.relative_time AS duration, e.thread, e.mal_execution_id FROM (SELECT * FROM profiler_event WHERE execution_state=1 AND mal_execution_id=14) AS e JOIN (SELECT * FROM profiler_event AS WHERE execution_state=0 AND mal_execution_id=14) s ON e.pc=s.pc AND e.mal_execution_id=s.mal_execution_id ORDER BY start_time ASC"
 }
+
+# Variables
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT var_type.variable_id, var_type.name, var_type.tname, var_type.mal_value, variable_event.event_id, variable_event.relative_time, variable_event.short_statement FROM (SELECT v.*, t.tname FROM mal_variable v JOIN mal_type t ON v.type_id=t.type_id) AS var_type JOIN (SELECT ev.variable_id, pe.* FROM event_variable_list AS ev JOIN profiler_event AS pe ON ev.event_id=pe.event_id WHERE pe.execution_state=1 ORDER BY pe.relative_time ASC) AS variable_event ON var_type.variable_id=variable_event.variable_id WHERE var_type.mal_execution_id=34 ORDER BY variable_event.relative_time, var_type.variable_id ASC"
+}
+# "query": "SELECT * from profiler_event where event_id in (SELECT event_id FROM event_variable_list WHERE variable_id=42) AND execution_state=0 ORDER BY relative_time ASC"
+
+# foo
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM mal_variable v JOIN mal_type t ON v.type_id=t.type_id"
+}
+
+#lala
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT ev.variable_id, pe.* FROM event_variable_list AS ev JOIN profiler_event AS pe ON ev.event_id=pe.event_id WHERE pe.execution_state=1 ORDER BY pe.relative_time ASC"
+}
