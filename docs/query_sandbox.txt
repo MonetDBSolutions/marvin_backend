@@ -872,8 +872,18 @@ GET http://localhost:8000/executions/1/statements
 #   "data_length": 57
 # }
 
+##########################
+# Released API ends here #
+##########################
 
-# Developer sandbox...
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": ""
+}
+
+#
 PUT http://localhost:8000/developer/query
 Content-Type: application/json
 {
@@ -921,4 +931,83 @@ PUT http://localhost:8000/developer/query
 Content-Type: application/json
 {
     "query": "SELECT ev.variable_id, pe.* FROM event_variable_list AS ev JOIN profiler_event AS pe ON ev.event_id=pe.event_id WHERE pe.execution_state=1 ORDER BY pe.relative_time ASC"
+}
+
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT 0.5*(event_id + variable_id)*(event_id + variable_id + 1) + variable_id AS foo FROM event_variable_list WHERE created=1"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT DISTINCT mv.variable_id, mv.mal_execution_id, mv.name, mv.mal_value, cev.event_id as creation, dev.event_id as destruction FROM mal_variable AS mv LEFT JOIN (SELECT * FROM event_variable_list WHERE created=1) AS cev ON mv.variable_id=cev.variable_id LEFT JOIN (SELECT * FROM event_variable_list WHERE eol=1) AS dev on mv.variable_id=dev.variable_id WHERE mal_execution_id=1 ORDER BY variable_id ASC"
+}
+
+# The following object violates the assumption that variables are
+# created/assigned once.
+
+# {
+#   "version": "11.34.0 (hg id: e6317c345763+)",
+#   "source": "trace",
+#   "clk": 48359187,
+#   "ctime": 1552925627212218,
+#   "thread": 7,
+#   "function": "user.s4_1",
+#   "pc": 15,
+#   "tag": 11,
+#   "module": "bat",
+#   "instruction": "append",
+#   "session": "edd5fb0e-9ae7-4943-bca1-68a1722a052f",
+#   "state": "done",
+#   "usec": 98,
+#   "rss": 81,
+#   "size": 0,
+#   "stmt": "X_29=<tmp_1147>[1]:bat[:str] := bat.append(X_22=<tmp_1147>[1]:bat[:str], \"int\":str);",
+#   "short": "X_29[1]:= append( X_22[1], \"int\" )",
+#   "prereq": [
+#     11
+#   ],
+#   "ret": [
+#     {
+#       "index": 0,
+#       "name": "X_29",
+#       "type": "bat[:str]",
+#       "kind": "transient",
+#       "bid": 615,
+#       "count": 1,
+#       "size": 8205,
+#       "eol": 0
+#     }
+#   ],
+#   "arg": [
+#     {
+#       "index": 1,
+#       "name": "X_22",
+#       "type": "bat[:str]",
+#       "kind": "transient",
+#       "bid": 615,
+#       "count": 1,
+#       "size": 8205,
+#       "eol": 1
+#     },
+#     {
+#       "index": 2,
+#       "name": "X_29",
+#       "type": "str",
+#       "value": "\"int\"",
+#       "eol": 1
+#     }
+#   ]
+# }
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM profiler_event WHERE event_id IN (9, 113)"
 }
