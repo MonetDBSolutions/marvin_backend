@@ -16,7 +16,7 @@ import gunicorn.app.base
 from gunicorn.six import iteritems
 from mal_analytics import db_manager
 
-from marvin_backend import queries, executions, developer
+from marvin_backend import queries, executions, developer, heartbeats
 
 """Main module."""
 
@@ -46,6 +46,12 @@ def create_app(manager):
 
     execution_statements = executions.ExecutionStatements(manager)
     api.add_route('/executions/{eid}/statements', execution_statements)
+
+    all_heartbeats = heartbeats.HeartBeats(manager)
+    api.add_route('/heartbeats', all_heartbeats)
+
+    server_heartbeats = heartbeats.SingleServerHeartbeats(manager)
+    api.add_route('/heartbeats/{sid}', server_heartbeats)
 
     # Mostly for debugging, but could be useful for users as well.
     arbitrary_sql = developer.SQLQuery(manager)
