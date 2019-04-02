@@ -16,6 +16,7 @@ Sphinx = "==1.7.1"
 ipython = "*"
 trepan3k = "*"
 pymonetdb = "*"
+codecov = "*"
 
 [packages]
 falcon = ">=1.4.1"
