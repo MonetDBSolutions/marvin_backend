@@ -167,6 +167,8 @@ def api_endpoint_404_on_empty(func):
             resp.status = falcon.HTTP_404
             resp.body = None
 
+        return result
+
     return api_endpoint_404_on_empty_impl
 
 def api_endpoint_singleton_result(func):
@@ -175,7 +177,7 @@ def api_endpoint_singleton_result(func):
         result = func(cls, req, resp, *args, **kwargs)
 
         print("SINGLETON DECORATOR", result)
-        if result and  len(result) > 1:
+        if result and len(result) > 1:
             msg = "Expecting single result, but got {}.".format(len(result))
             doc = {
                 'links': {
@@ -185,6 +187,7 @@ def api_endpoint_singleton_result(func):
             }
 
             resp.status = falcon.HTTP_500
-            return result
+
+        return result
 
     return api_endpoint_singleton_result_impl
