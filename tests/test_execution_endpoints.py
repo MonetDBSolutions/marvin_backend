@@ -7,7 +7,6 @@
 from unittest.mock import call
 
 import falcon
-from numpy import array
 
 
 class TestExecutionEndpoints(object):
