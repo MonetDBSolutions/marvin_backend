@@ -3660,3 +3660,10 @@ Content-Type: application/json
 {
     "query": "SELECT * FROM profiler_event WHERE event_id IN (31, 12, 34)"
 }
+
+# Events that violate the uniqness assumption.
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id"
+}
