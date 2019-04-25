@@ -21,10 +21,10 @@ class Traces(object):
     def on_post(self, req, resp):
         # If Content-Length happens to be 0, or the header is missing
         # altogether, this will not block.
-        trace_string = req.stream.read(req.content_length or 0)
+        req_body_bytes = req.stream.read(req.content_length or 0)
 
         try:
-            self._db.parse_trace(trace_string)
+            self._db.parse_trace(req_body_bytes.decode("utf-8"))
             resp.status = falcon.HTTP_CREATED
             resp.body = None
         except Exception as e:

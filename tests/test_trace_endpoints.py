@@ -19,7 +19,7 @@ class TestTraceEndpoints(object):
         )
 
         # DatabaseManager::parse_trace does not return anything
-        mock_db.parse_trace.assert_called_with(trace)
+        mock_db.parse_trace.assert_called_with(trace.decode('utf-8'))
         assert response.status == falcon.HTTP_CREATED
 
     def test_upload_wrong_trace(self, client, mock_db):
@@ -34,7 +34,7 @@ class TestTraceEndpoints(object):
             headers={'content-type': 'text/plain'}
         )
 
-        mock_db.parse_trace.assert_called_with(bad_trace)
+        mock_db.parse_trace.assert_called_with(bad_trace.decode('utf-8'))
         assert response.status == falcon.HTTP_BAD_REQUEST
 
     def test_upload_empty_trace(self, client, mock_db):
@@ -45,5 +45,5 @@ class TestTraceEndpoints(object):
             '/traces',
         )
 
-        mock_db.parse_trace.assert_called_with(b"")
+        mock_db.parse_trace.assert_called_with("")
         assert response.status == falcon.HTTP_BAD_REQUEST
