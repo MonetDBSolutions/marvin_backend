@@ -3674,3 +3674,10 @@ Content-Type: application/json
 {
     "query": "SELECT r.event_id FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id WHERE l.event_id < r.event_id"
 }
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * from rejected_profiler_event"
+}
