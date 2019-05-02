@@ -31,7 +31,7 @@ class SingleQuery(object):
 
     def on_patch(self, req, resp, qid):
         if req.content_length:
-            doc = json.load(req.stream)
+            doc = json.loads(req.stream.read(req.content_length))
             label = doc.get('label')
             if label is None:
                 # Bad request

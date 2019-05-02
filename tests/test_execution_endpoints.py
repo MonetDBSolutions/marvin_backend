@@ -77,7 +77,7 @@ class TestExecutionEndpoints(object):
             }
         }
 
-        response = client.simulate_get('/executions/1/')
+        response = client.simulate_get('/executions/1')
         result_doc = response.json
 
         mock_db.execute_query.assert_called_with("SELECT * FROM mal_execution WHERE execution_id=%(eid)s", {'eid': '1'})
@@ -148,7 +148,7 @@ class TestExecutionEndpoints(object):
             }
         }
 
-        response = client.simulate_get('/executions/1/statements/')
+        response = client.simulate_get('/executions/1/statements')
         result_doc = response.json
 
         mock_db.execute_query.assert_called_with("SELECT * FROM instructions WHERE mal_execution_id=%(eid)s", {'eid': '1'})
