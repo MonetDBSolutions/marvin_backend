@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -22,6 +22,9 @@ class Traces(object):
         # If Content-Length happens to be 0, or the header is missing
         # altogether, this will not block.
         req_body_bytes = req.stream.read(req.content_length or 0)
+
+        LOGGER.debug("Incoming data length %d", len(req_body_bytes))
+
 
         try:
             self._db.parse_trace(req_body_bytes.decode("utf-8"))

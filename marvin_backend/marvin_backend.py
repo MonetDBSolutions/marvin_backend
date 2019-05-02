@@ -54,7 +54,7 @@ def create_app(manager):
     api.add_route('/heartbeats/{sid}', server_heartbeats)
 
     trace_uploads = traces.Traces(manager)
-    api.add_route('/traces/', trace_uploads)
+    api.add_route('/traces', trace_uploads)
 
     # Mostly for debugging, but could be useful for users as well.
     arbitrary_sql = developer.SQLQuery(manager)
