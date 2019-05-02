@@ -3665,5 +3665,12 @@ Content-Type: application/json
 PUT http://localhost:8000/developer/query
 Content-Type: application/json
 {
-    "query": "SELECT * FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id"
+    "query": "SELECT l.event_id as event_id1, r.event_id as envet_id2, l.short_statement as short_statement1, r.short_statement as short_statement2 FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id WHERE l.event_id < r.event_id"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT r.event_id FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id WHERE l.event_id < r.event_id"
 }
