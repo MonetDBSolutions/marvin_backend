@@ -17,6 +17,7 @@ ipython = "*"
 trepan3k = "*"
 pymonetdb = "*"
 codecov = "*"
+marvin-cli = {path = "./../marvin_cli/dist/marvin_cli-0.1.0-py3-none-any.whl"}
 
 [packages]
 falcon = ">=1.4.1"
