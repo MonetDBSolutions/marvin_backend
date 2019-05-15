@@ -1,0 +1,216 @@
+* Released API
+** What queries are in the database?
+#+BEGIN_SRC http :pretty
+  GET http://localhost:8000/queries/
+#+END_SRC
+
+** Show metadata for query 1
+#+begin_src http :pretty
+  GET http://localhost:8000/queries/1/
+#+end_src
+
+** Set the mnemonic label of query 1
+#+begin_src http :pretty
+#+end_src
+PATCH http://localhost:8000/queries/1/
+Content-Type: application/json
+{"label":"distributed query"}
+# --- no output ---
+
+** Get the metadata again to verify that the label changed
+#+begin_src http :pretty
+  GET http://localhost:8000/queries/1/
+#+end_src
+
+** Show the execution ids for query 1
+mserver5 BUG: not all executions are reachable here
+
+#+begin_src http :pretty
+  GET http://localhost:8000/queries/1/executions
+#+end_src
+
+** Show all the executions in the database
+#+begin_src http :pretty
+  GET http://localhost:8000/executions
+#+end_src
+
+** Show the metadata for execution 1
+#+begin_src http :pretty
+  GET http://localhost:8000/executions/1/
+#+end_src
+
+** Show the statements for execution 1
+#+begin_src http :pretty
+  GET http://localhost:8000/executions/1/statements
+#+end_src
+
+** All heartbeats
+#+begin_src http :pretty
+  GET http://localhost:8000/heartbeats
+#+end_src
+
+** Single server heartbeats
+#+begin_src http :pretty
+  GET http://localhost:8000/heartbeats/edd5fb0e-9ae7-4943-bca1-68a1722a052f
+#+end_src
+
+
+* Sandbox
+** Template
+#+begin_src http :pretty
+  PUT http://localhost:8000/developer/query
+  Content-Type: application/json
+  {
+      "query": ""
+  }
+#+end_src
+
+** Misc 
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM profiler_event WHERE event_id=1"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM prerequisite_events WHERE consequent_event=56"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT pc, short_statement, prerequisite_event FROM profiler_event AS pr JOIN prerequisite_events AS pe ON pr.event_id = pe.consequent_event WHERE consequent_event=56"
+}
+
+# MAL Plan
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT e.pc, e.short_statement, s.relative_time as start_time, e.relative_time as end_time, e.relative_time - s.relative_time AS duration, e.thread, e.mal_execution_id FROM (SELECT * FROM profiler_event WHERE execution_state=1 AND mal_execution_id=14) AS e JOIN (SELECT * FROM profiler_event AS WHERE execution_state=0 AND mal_execution_id=14) s ON e.pc=s.pc AND e.mal_execution_id=s.mal_execution_id ORDER BY start_time ASC"
+}
+
+# Variables
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT var_type.variable_id, var_type.name, var_type.tname, var_type.mal_value, variable_event.event_id, variable_event.relative_time, variable_event.short_statement FROM (SELECT v.*, t.tname FROM mal_variable v JOIN mal_type t ON v.type_id=t.type_id) AS var_type JOIN (SELECT ev.variable_id, pe.* FROM event_variable_list AS ev JOIN profiler_event AS pe ON ev.event_id=pe.event_id WHERE pe.execution_state=1) AS variable_event ON var_type.variable_id=variable_event.variable_id WHERE var_type.mal_execution_id=1 ORDER BY variable_event.relative_time, var_type.variable_id ASC"
+}
+# "query": "SELECT * from profiler_event where event_id in (SELECT event_id FROM event_variable_list WHERE variable_id=42) AND execution_state=0 ORDER BY relative_time ASC"
+
+# foo
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM mal_variable v JOIN mal_type t ON v.type_id=t.type_id"
+}
+
+#lala
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT ev.variable_id, pe.* FROM event_variable_list AS ev JOIN profiler_event AS pe ON ev.event_id=pe.event_id WHERE pe.execution_state=1 ORDER BY pe.relative_time ASC"
+}
+
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT 0.5*(event_id + variable_id)*(event_id + variable_id + 1) + variable_id AS foo FROM event_variable_list WHERE created=1"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT DISTINCT mv.variable_id, mv.mal_execution_id, mv.name, mv.mal_value, cev.event_id as creation, dev.event_id as destruction FROM mal_variable AS mv LEFT JOIN (SELECT * FROM event_variable_list WHERE created=1) AS cev ON mv.variable_id=cev.variable_id LEFT JOIN (SELECT * FROM event_variable_list WHERE eol=1) AS dev on mv.variable_id=dev.variable_id WHERE mal_execution_id=1 ORDER BY variable_id ASC"
+}
+
+# The following object violates the assumption that variables are
+# created/assigned once.
+
+# {
+#   "version": "11.34.0 (hg id: e6317c345763+)",
+#   "source": "trace",
+#   "clk": 48359187,
+#   "ctime": 1552925627212218,
+#   "thread": 7,
+#   "function": "user.s4_1",
+#   "pc": 15,
+#   "tag": 11,
+#   "module": "bat",
+#   "instruction": "append",
+#   "session": "edd5fb0e-9ae7-4943-bca1-68a1722a052f",
+#   "state": "done",
+#   "usec": 98,
+#   "rss": 81,
+#   "size": 0,
+#   "stmt": "X_29=<tmp_1147>[1]:bat[:str] := bat.append(X_22=<tmp_1147>[1]:bat[:str], \"int\":str);",
+#   "short": "X_29[1]:= append( X_22[1], \"int\" )",
+#   "prereq": [
+#     11
+#   ],
+#   "ret": [
+#     {
+#       "index": 0,
+#       "name": "X_29",
+#       "type": "bat[:str]",
+#       "kind": "transient",
+#       "bid": 615,
+#       "count": 1,
+#       "size": 8205,
+#       "eol": 0
+#     }
+#   ],
+#   "arg": [
+#     {
+#       "index": 1,
+#       "name": "X_22",
+#       "type": "bat[:str]",
+#       "kind": "transient",
+#       "bid": 615,
+#       "count": 1,
+#       "size": 8205,
+#       "eol": 1
+#     },
+#     {
+#       "index": 2,
+#       "name": "X_29",
+#       "type": "str",
+#       "value": "\"int\"",
+#       "eol": 1
+#     }
+#   ]
+# }
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * FROM profiler_event WHERE event_id IN (31, 12, 34)"
+}
+
+# Events that violate the uniqness assumption.
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT l.event_id as event_id1, r.event_id as envet_id2, l.short_statement as short_statement1, r.short_statement as short_statement2 FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id WHERE l.event_id < r.event_id"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT r.event_id FROM profiler_event as l JOIN profiler_event as r ON l.execution_state=r.execution_state AND l.mal_execution_id=r.mal_execution_id AND l.pc=r.pc AND l.event_id<>r.event_id WHERE l.event_id < r.event_id"
+}
+
+#
+PUT http://localhost:8000/developer/query
+Content-Type: application/json
+{
+    "query": "SELECT * from rejected_profiler_event"
+}
