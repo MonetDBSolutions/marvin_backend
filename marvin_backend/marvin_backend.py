@@ -55,6 +55,9 @@ def create_app(manager):
     trace_uploads = traces.Traces(manager)
     api.add_route('/traces', trace_uploads)
 
+    cpu_loads = heartbeats.CPUload(manager)
+    api.add_route('/cpuload/{sid}', cpu_loads)
+
     # Mostly for debugging, but could be useful for users as well.
     arbitrary_sql = developer.SQLQuery(manager)
     api.add_route('/developer/query', arbitrary_sql)

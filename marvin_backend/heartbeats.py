@@ -37,3 +37,16 @@ class SingleServerHeartbeats(object):
         server_beats = self._db.execute_query(server_beats_sql, {'sid': sid})
 
         return server_beats
+
+
+class CPUload(object):
+    def __init__(self, db):
+        self._db = db
+
+    @utils.api_endpoint
+    def on_get(self, req, resp, sid):
+        cpuload_sql = "SELECT h.heartbeat_id, h.clk, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s GROUP BY h.heartbeat_id, h.clk"
+        cpuload = self._db.execute_query(cpuload_sql, {'sid': sid})
+
+        return cpuload
+
