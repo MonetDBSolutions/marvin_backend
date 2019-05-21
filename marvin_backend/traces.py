@@ -9,8 +9,6 @@ import logging
 
 import falcon
 
-from marvin_backend import utils
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -24,7 +22,6 @@ class Traces(object):
         req_body_bytes = req.stream.read(req.content_length or 0)
 
         LOGGER.debug("Incoming data length %d", len(req_body_bytes))
-
 
         try:
             self._db.parse_trace(req_body_bytes.decode("utf-8"))

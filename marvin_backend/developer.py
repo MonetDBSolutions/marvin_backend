@@ -11,9 +11,12 @@ import falcon
 
 from marvin_backend.utils import DLtoLD, NumpyJSONEncoder, find_query_execution_ids
 
+LOGGER = logging.getLogger(__name__)
+
 
 class SQLQuery(object):  # pragma: no coverage
     """Endpoints to execute arbitrary queries against the database"""
+
     def __init__(self, db):
         self._db = db
 
@@ -28,7 +31,9 @@ class SQLQuery(object):  # pragma: no coverage
                 'error': msg,
             }
             resp.status = falcon.HTTP_400
-            resp.body = json.dumps(doc, ensure_ascii=False, cls=NumpyJSONEncoder)
+            resp.body = json.dumps(doc,
+                                   ensure_ascii=False,
+                                   cls=NumpyJSONEncoder)
             LOGGER.error(msg)
             return
 

@@ -17,7 +17,6 @@ from gunicorn.six import iteritems
 from mal_analytics import db_manager
 
 from marvin_backend import queries, executions, developer, heartbeats, traces
-
 """Main module."""
 
 LOGGER = logging.getLogger(__name__)
@@ -68,7 +67,8 @@ def get_app(database_path=None):  # pragma: no coverage
     # db_path = database_path or os.environ.get('MARVIN_DB_PATH', './marvin_db')
     # For dev purposes the default db location is at the
     # db_path/dev_db subdirectory of the current directory.
-    db_path = database_path or os.environ.get('MARVIN_DB_PATH', './db_path/dev_db')
+    db_path = database_path or os.environ.get('MARVIN_DB_PATH',
+                                              './db_path/dev_db')
 
     # This works both if db_path is relative, or absolute.
     actual_path = str((curr_path / db_path).resolve())
@@ -96,17 +96,26 @@ class Marvin(gunicorn.app.base.BaseApplication):  # pragma: no coverage
         return self._application
 
 
-def parse_cli():   # pragma: no coverage
+def parse_cli():  # pragma: no coverage
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dbpath', '-d', help='Path to the database holding the traces')
+    parser.add_argument('--dbpath',
+                        '-d',
+                        help='Path to the database holding the traces')
 
-    parser.add_argument('--port', '-p', default='8000', help='Port number that the server will listen to')
-    parser.add_argument('--workers', '-w', type=int, default=1, help='Number of workers')
+    parser.add_argument('--port',
+                        '-p',
+                        default='8000',
+                        help='Port number that the server will listen to')
+    parser.add_argument('--workers',
+                        '-w',
+                        type=int,
+                        default=1,
+                        help='Number of workers')
 
     return parser.parse_args()
 
 
-def main():   # pragma: no coverage
+def main():  # pragma: no coverage
     arguments = parse_cli()
     print(arguments)
     options = {
@@ -116,5 +125,5 @@ def main():   # pragma: no coverage
     Marvin(get_app(arguments.dbpath), options).run()
 
 
-if __name__ == '__main__':   # pragma: no coverage
+if __name__ == '__main__':  # pragma: no coverage
     main()
