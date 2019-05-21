@@ -81,13 +81,13 @@ class QueryLoad(object):
 
         # Find the execution time limits: the earliest and the latest timestamp
         # of each execution.
-        times_sql = "SELECT min(start_time) AS start_t, max(end_time) AS end_t FROM instructions WHERE mal_execution_id=%(eid)s"
+        times_sql = "SELECT m.server_session AS server, min(i.start_time) AS start_t, max(i.end_time) AS end_t FROM instructions AS i JOIN mal_execution AS m ON i.mal_execution_id=m.execution_id WHERE mal_execution_id=%(eid)s GROUP BY m.server_session"
         times = list()
         LOGGER.debug("flaf %s", execution_ids)
         for ex_id in execution_ids:
             t = self._db.execute_query(times_sql, {'eid': ex_id})
             LOGGER.debug("=== %s", t)
-            times.append([t['start_t'][0], t['end_t'][0]])
+            times.append([t['server'][0], t['start_t'][0], t['end_t'][0]])
 
         LOGGER.debug("*" * 20)
         LOGGER.debug("Times = %s", times)
