@@ -58,6 +58,9 @@ def create_app(manager):
     cpu_loads = heartbeats.CPUload(manager)
     api.add_route('/cpuload/{sid}', cpu_loads)
 
+    cpu_loads_per_query = heartbeats.QueryLoad(manager)
+    api.add_route('/queryload/{qid}', cpu_loads_per_query)
+
     # Mostly for debugging, but could be useful for users as well.
     arbitrary_sql = developer.SQLQuery(manager)
     api.add_route('/developer/query', arbitrary_sql)
