@@ -25,6 +25,7 @@ class Queries(object):
 
         return all_queries
 
+
 class SingleQuery(object):
     def __init__(self, db):
         self._db = db
@@ -83,7 +84,9 @@ class QueryExecutions(object):
     def __init__(self, db):
         self._db = db
 
-    def on_get(self, req, resp, qid):
+    # TODO Move this method out of this class. Maybe add a layer that handles
+    # all the interactions with the DB?
+    def gather_executions(self, qid):
         edges_sql = "SELECT parent_id, child_id FROM initiates_executions"
         start_node_sql = "SELECT e.execution_id FROM mal_execution AS e JOIN query AS q ON e.execution_id = q.root_execution_id WHERE q.query_id=%(qid)s"
 
@@ -99,10 +102,17 @@ class QueryExecutions(object):
         LOGGER.debug("*" * 30)
 
         if exec_graph_edges["child_id"].size == 0 or not start_node["execution_id"]:
+            raise Exception
+
+        return utils.find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
+
+    def on_get(self, req, resp, qid):
+
+        try:
+            execution_ids = self.gather_executions(qid)
+        except Exception:
             resp.status = falcon.HTTP_404
             return
-
-        execution_ids = utils.find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?
 
         doc = {
             'links': {
