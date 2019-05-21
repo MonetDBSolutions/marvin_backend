@@ -157,6 +157,7 @@ def api_endpoint(func):
 
     return api_endpoint_impl
 
+
 def api_endpoint_404_on_empty(func):
     @functools.wraps(func)
     def api_endpoint_404_on_empty_impl(cls, req, resp, *args, **kwargs):
@@ -170,6 +171,7 @@ def api_endpoint_404_on_empty(func):
         return result
 
     return api_endpoint_404_on_empty_impl
+
 
 def api_endpoint_singleton_result(func):
     @functools.wraps(func)
@@ -187,6 +189,7 @@ def api_endpoint_singleton_result(func):
             }
 
             resp.status = falcon.HTTP_500
+            resp.body = json.dumps(doc)
 
         return result
 
