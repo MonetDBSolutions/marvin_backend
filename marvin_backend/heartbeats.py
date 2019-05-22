@@ -43,7 +43,7 @@ class CPUload(object):
 
     @utils.api_endpoint
     def on_get(self, req, resp, sid):
-        cpuload_sql = "SELECT h.heartbeat_id, h.clk, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s GROUP BY h.heartbeat_id, h.clk"
+        cpuload_sql = "SELECT h.heartbeat_id, h.ctime, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s GROUP BY h.heartbeat_id, h.clk"
         cpuload = self._db.execute_query(cpuload_sql, {'sid': sid})
 
         return cpuload
@@ -77,7 +77,7 @@ class QueryLoad(object):
 
         # Find the execution time limits: the earliest and the latest timestamp
         # of each execution.
-        times_sql = "SELECT m.server_session AS server, min(i.start_time) AS start_t, max(i.end_time) AS end_t FROM instructions AS i JOIN mal_execution AS m ON i.mal_execution_id=m.execution_id WHERE mal_execution_id=%(eid)s GROUP BY m.server_session"
+        times_sql = "SELECT m.server_session AS server, min(i.astart_time) AS start_t, max(i.aend_time) AS end_t FROM instructions AS i JOIN mal_execution AS m ON i.mal_execution_id=m.execution_id WHERE mal_execution_id=%(eid)s GROUP BY m.server_session"
         times = dict()
         for ex_id in execution_ids:
             t = self._db.execute_query(times_sql, {'eid': ex_id})
@@ -136,7 +136,7 @@ class QueryLoad(object):
         # Now that we have the relevant timelines find all the cpuload objects
         # from the database.
 
-        cpuload_sql = "SELECT h.server_session, h.heartbeat_id, h.clk, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s AND h.clk>=%(start_time)s AND h.clk<%(end_time)s GROUP BY h.heartbeat_id, h.clk, h.server_session"
+        cpuload_sql = "SELECT h.server_session, h.heartbeat_id, h.ctime, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s AND h.ctime>=%(start_time)s AND h.ctime<%(end_time)s GROUP BY h.heartbeat_id, h.ctime, h.server_session"
         cpuload = dict()
         for server, timeline in timelines.items():
             for interval in timeline:
