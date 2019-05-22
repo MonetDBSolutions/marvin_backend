@@ -43,7 +43,7 @@ class CPUload(object):
 
     @utils.api_endpoint
     def on_get(self, req, resp, sid):
-        cpuload_sql = "SELECT h.heartbeat_id, h.ctime, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s GROUP BY h.heartbeat_id, h.clk"
+        cpuload_sql = "SELECT h.heartbeat_id, h.ctime, avg(c.val) AS cpuload FROM cpuload AS c JOIN heartbeat AS h ON c.heartbeat_id=h.heartbeat_id WHERE h.server_session=%(sid)s GROUP BY h.heartbeat_id, h.ctime"
         cpuload = self._db.execute_query(cpuload_sql, {'sid': sid})
 
         return cpuload
