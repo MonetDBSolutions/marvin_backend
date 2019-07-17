@@ -88,7 +88,7 @@ class QueryExecutions(object):
     # all the interactions with the DB?
     def gather_executions(self, qid):
         edges_sql = "SELECT parent_id, child_id FROM initiates_executions"
-        start_node_sql = "SELECT e.execution_id FROM mal_execution AS e JOIN query AS q ON e.execution_id = q.root_execution_id WHERE q.query_id=%(qid)s"
+        start_node_sql = "SELECT root_execution_id FROM query WHERE query_id=%(qid)s"
 
         all_nodes = self._db.execute_query("SELECT execution_id FROM mal_execution")
         exec_graph_edges = self._db.execute_query(edges_sql)
