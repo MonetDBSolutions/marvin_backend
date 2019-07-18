@@ -101,7 +101,7 @@ class QueryExecutions(object):
         LOGGER.debug("Edges data: %s", exec_graph_edges)
         LOGGER.debug("*" * 30)
 
-        if exec_graph_edges["child_id"].size == 0 or not start_node["execution_id"]:
+        if exec_graph_edges["child_id"].size == 0 or not start_node["root_execution_id"]:
             raise Exception
 
         return utils.find_query_execution_ids(start_node, exec_graph_edges)  # Do we need to abstract this by passing a function to be executed for every visited node?

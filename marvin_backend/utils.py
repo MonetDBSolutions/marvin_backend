@@ -132,7 +132,7 @@ class SimpleGraph(object):
 # The interface of the graph tools to the rest of the system.
 def find_query_execution_ids(query_root_execution, execution_relation):
     g = SimpleGraph(list(zip(execution_relation['parent_id'], execution_relation['child_id'])))
-    return g.bfs(query_root_execution['execution_id'][0])
+    return g.bfs(query_root_execution['root_execution_id'][0])
 
 
 def api_endpoint(func):
