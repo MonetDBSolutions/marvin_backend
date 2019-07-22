@@ -141,7 +141,7 @@ class TestQueryEndpoints(object):
                 "child_id": array([1, 2, 3, 4, 5])
             },
             {
-                "execution_id": array([1])
+                "root_execution_id": array([1])
             }
         ]
 
