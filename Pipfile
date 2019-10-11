@@ -22,7 +22,6 @@ marvin-cli = {path = "./../marvin_cli/dist/marvin_cli-0.1.0-py3-none-any.whl"}
 [packages]
 falcon = ">=1.4.1"
 gunicorn = "*"
-httpie = "*"
 marvin-backend = {editable = true,path = "."}
 mal-analytics = {editable = true,path = "./../mal_analytics"}
 monetdblite = ">=0.6.3"
